@@ -23,7 +23,7 @@ XYZ
 
 $ python main_train.py
 
-# Using pretrained model for segmentation
+# Using pretrained DSN model for testing
 * The folder **Test_trained_model** contains a pretrained model and a script which can use that pretrained model to descatter a test 3D backpropagation volume. 
  
 * In order to perform descattering on a sample 3D backpropagation (not used in the training process), download the folder 'test_data' from the following google drive link:
