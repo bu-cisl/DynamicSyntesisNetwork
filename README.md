@@ -39,7 +39,7 @@ $ python main_test.py
 * The model will perform descattering on all test data and save results in the folder 'test_results'
 
 ## Dependencies
-**environment.yaml** lists dependencies used to run this code on an Nvidia RTX-8000 GPU.
+**environment.yml** lists dependencies used to run this code on an Nvidia RTX-8000 GPU.
 
 
 
