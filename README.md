@@ -6,7 +6,7 @@ W.Tahir, L. Tian, "Adaptive 3D descattering with a dynamic synthesis network
 https://arxiv.org/abs/2107.00484
 
 
-![alt text](https://ibb.co/FmQj3Zw)
+![alt text](DSN_schematic.PNG)
 
 **environment.yaml** lists dependencies used to run this code on an Nvidia RTX-8000 GPU.
 
