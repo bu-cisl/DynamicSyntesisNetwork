@@ -24,14 +24,15 @@ XYZ
 $ python main_train.py
 
 # Using pretrained DSN model for testing
-* The folder **Test_trained_model** contains a pretrained model and a script which can use that pretrained model to descatter a test 3D backpropagation volume. 
- 
-* In order to perform descattering on a sample 3D backpropagation (not used in the training process), download the folder 'test_data' from the following google drive link:
-XYZ
 
-* Copy the downloaded 'test_data' folder to the 'Test_trained_model' folder, such that it's path is **'.../Test_trained_model/test_data'**. Not that the data in this folder has already been pre-processed using the method outlined in our paper.
+* We provide a pretrained model and a script which can use the pretrained model to descatter a test 3D backpropagation volume. 
 
-* In the folder **Test_trained_model**, execute the script main_test.py with default configurations as follows:
+* In order to perform descattering on a test-3D-backpropagation (not used in the training process), download the folder 'test_data' and 'chkpt' from the following google drive link:
+https://drive.google.com/drive/folders/1q5hliaW8NVGyA74BP49uqaWpJdVPOmiA?usp=sharing
+
+* Copy the downloaded 'test_data' and 'chkpt' folders to the 'Test_trained_model' folder, such that their path is **'.../Test_trained_model/test_data'** and  **'.../Test_trained_model/chkpt'**. 
+
+* In the folder **Test_trained_model**, execute the script main_test.py as follows:
 
 $ python main_test.py
 
