@@ -9,7 +9,7 @@ https://arxiv.org/abs/2107.00484
 
 ![DSN Schematic](DSN_schematic.PNG)
 
-Figure: DSN Schematic
+**Figure:** DSN Schematic
 
 # Training new model
 * The script **Train_new_model/main_train.py** contains the code for training the network. 
