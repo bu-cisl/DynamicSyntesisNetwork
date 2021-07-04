@@ -9,8 +9,7 @@ https://arxiv.org/abs/2107.00484
 
 ![DSN Schematic](DSN_schematic.PNG)
 
-**environment.yaml** lists dependencies used to run this code on an Nvidia RTX-8000 GPU.
-
+Figure: DSN Schematic
 
 # Training new model
 * The script **Train_new_model/main_train.py** contains the code for training the network. 
@@ -37,6 +36,9 @@ XYZ
 $ python main_test.py
 
 * The model will perform descattering on all test data and save results in the folder 'test_results'
+
+## Dependencies
+**environment.yaml** lists dependencies used to run this code on an Nvidia RTX-8000 GPU.
 
 
 
