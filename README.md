@@ -1,13 +1,13 @@
 # DynamicSyntesisNetwork
 
-This is the implementation of the dyniamic synthesis network for large-scale 3D descattering, as presented in our publication:
+This is the implementation of the dyniamic synthesis network (DSN) for large-scale 3D descattering, as presented in our publication:
 
-W.Tahir, L. Tian, "Adaptive 3D descattering with a dynamic synthesis network
-", arXiv (2021), 2107.00484
+W.Tahir, L. Tian, "Adaptive 3D descattering with a dynamic synthesis network", arXiv (2021), 2107.00484
+
 https://arxiv.org/abs/2107.00484
 
 
-![alt text](DSN_schematic.PNG)
+![DSN Schematic](DSN_schematic.PNG)
 
 **environment.yaml** lists dependencies used to run this code on an Nvidia RTX-8000 GPU.
 
