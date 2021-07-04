@@ -6,7 +6,7 @@ Publication Link: https://arxiv.org/abs/2107.00484
 Last Updated: July 04, 2021
 """
 
-import tensorflow as tf
+import tensorflow as tf 
 import numpy as np
 from vnet_3D_encoder import vnet_enc
 from vnet_3D_synthesized_decoder import v_net
@@ -19,7 +19,7 @@ import time
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
-### Main program begins here:
+# Main program begins here:
 downsample_step = 4
 input_channels = 1
 output_channels = 1
