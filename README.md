@@ -15,7 +15,7 @@ https://arxiv.org/abs/2107.00484
 * The script **Train_new_model/main_train.py** contains the code for training the network. 
 
 * In order to train the model, the data can be downloaded from the following google drive link:
-XYZ
+https://drive.google.com/drive/folders/1q5hliaW8NVGyA74BP49uqaWpJdVPOmiA
 
 * Download the 'data' folder from the above link and copy it to the 'Train_new_model' folder, such that it's path is **.../Train_new_model/data**
 
