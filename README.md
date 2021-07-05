@@ -28,7 +28,7 @@ $ python main_train.py
 * We provide a pretrained model and a script which can use the pretrained model to descatter a test 3D backpropagation volume. 
 
 * In order to perform descattering on a test-3D-backpropagation (not used in the training process), download the folder 'test_data' and 'chkpt' from the following google drive link:
-https://drive.google.com/drive/folders/1q5hliaW8NVGyA74BP49uqaWpJdVPOmiA?usp=sharing
+https://drive.google.com/drive/folders/1q5hliaW8NVGyA74BP49uqaWpJdVPOmiA
 
 * Copy the downloaded 'test_data' and 'chkpt' folders to the 'Test_trained_model' folder, such that their path is **'.../Test_trained_model/test_data'** and  **'.../Test_trained_model/chkpt'**. 
 
