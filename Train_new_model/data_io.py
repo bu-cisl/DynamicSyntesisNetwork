@@ -1,8 +1,11 @@
 import time
 from typing import List, Iterable, Dict
+
 import numpy as np
+
+###from const import PATCH_SIZE
+
 import scipy.io as sio
-import cv2
 
 # consts
 AUGMENTATION_N = 1
@@ -10,9 +13,9 @@ PATCH_STRIDE_TEST = 128
 PATCH_STRIDE_TRAIN = 64
 PATCH_SIZE = (128,128,100)
 
-class Data:
+class Mouse:
     """
-    Class to assist in handling 3D data
+    A list of mouse image data in numpy array
     """
     # consts
     PREPROCESS_THRESHOLD = 184
@@ -25,58 +28,62 @@ class Data:
     _is_test = ...  # type: bool
     index_list = ...  # type: List[List[slice]]
     shape = ...  # type: tuple
-    datanum = ...
+    mousenum = ...
 
-    def __init__(self, data_i: int, *, is_test: bool):
+    def __init__(self, mouse_i: int, *, is_test: bool, data_dir: str = '../data/obj%d/'):
         """
-        Read the 3D image data (.tiff format) for test and train. One object
-        may include several 3D images according to img_num.
+        Read the mouse image data (.tiff format) for test and train. One mouse object
+        may include several images according to img_num.
 
-        :param data_i: Index of data (used to locate directory)
+        :param mouse_i: Index of mouse (used to locate directory)
         :param is_test: Whether it is for test (or not = for training)
         :param data_dir: Actual directory for data
         """
+        import cv2
         self._is_test = is_test
         self._img_num = 1
-        self.datanum = data_i + 1
+        self.mousenum = mouse_i + 1
 
         # Read data
+        time_start = time.time()
+        file_path = data_dir % (mouse_i + 1)
 
         self._o_images = []
         self._g_images = []
         self._h_images = []
         ff = 'NaN'
-        data_i_ = 9991
+        mouse_i_ = 9991
 
-        if data_i >= 0 and data_i <= 4:
+        if mouse_i >= 0 and mouse_i <= 4:
             ff = './data/conc_mix/'
-            data_i_ = data_i
-        if data_i >= 5 and data_i <= 14:
+            mouse_i_ = mouse_i
+        if mouse_i >= 5 and mouse_i <= 14:
             ff = './data/conc1/'
-            data_i_ = data_i - 4
-        if data_i >= 15 and data_i <= 34:
+            mouse_i_ = mouse_i - 4
+        if mouse_i >= 15 and mouse_i <= 34:
             ff = './data/conc2/'
-            data_i_ = data_i - 14
-        if data_i >= 35 and data_i <= 54:
+            mouse_i_ = mouse_i - 14
+        if mouse_i >= 35 and mouse_i <= 54:
             ff = './data/conc3/'
-            data_i_ = data_i - 34
-        if data_i >= 55 and data_i <= 74:
+            mouse_i_ = mouse_i - 34
+        if mouse_i >= 55 and mouse_i <= 74:
             ff = './data/conc4/'
-            data_i_ = data_i - 54
+            mouse_i_ = mouse_i - 54
 
-        print('[data_i: %d] [data_i_: %d] [ff: %s]'%(data_i, data_i_, ff))
+        print('[mouse_i: %d] [mouse_i_: %d] [ff: %s]'%(mouse_i, mouse_i_, ff))
 
         ###################################################
         # read backprop
-        filename = '%s/obj%d/f_bprop_abs_01.mat'%(ff, data_i_+1)
+        filename = '%s/obj%d/f_bprop_abs_01.mat'%(ff, mouse_i_+1)
         mat_contents = sio.loadmat(filename)
         temp_o = mat_contents['f_bprop_abs_01']
+        temp_o = (temp_o - np.mean(temp_o.flatten()))/np.std(temp_o.flatten())
         self._set_or_check_shape(temp_o)
         self._o_images.append(temp_o)
 
         ###################################################
         # read 3D gt
-        filename = '%s/obj%d/obj_maxproj.tif' % (ff, data_i_+1)
+        filename = '%s/obj%d/obj_maxproj.tif' % (ff, mouse_i_+1)
         #print('  ' + filename)
         temp_g = np.stack(cv2.imreadmulti(filename, flags=0)[1],axis=2)
         temp_g = temp_g.astype(np.float32)
@@ -86,9 +93,10 @@ class Data:
 
         ###################################################
         # read hologram
-        filename = '%s/obj%d/holo.mat' % (ff, data_i_ + 1)
+        filename = '%s/obj%d/holo.mat' % (ff, mouse_i_ + 1)
         mat_contents = sio.loadmat(filename)
         temp_h = mat_contents['meas']
+        temp_h = (temp_h - np.mean(temp_h.flatten()))/np.std(temp_h.flatten())
         self._h_images.append(temp_h)
 
         ###################################################
@@ -157,25 +165,25 @@ class Patch:
 
     Default shape: 128x128x128
     """
-    def __init__(self, data: Data, img_n: int, index: List[slice]):
-        self._data = data
+    def __init__(self, mouse: Mouse, img_n: int, index: List[slice]):
+        self._mouse = mouse
         self._index = index
         self._img_n = img_n
 
     def get_index(self):
         return self._index
 
-    def get_data(self):
-        return self._data
+    def get_mouse(self):
+        return self._mouse
 
     def get_original_image(self):
-        return self._data.get_original_image(self._img_n)[self._index]
+        return self._mouse.get_original_image(self._img_n)[self._index]
 
     def get_ground_truth(self):
-        return self._data.get_ground_truth(self._img_n)[self._index]
+        return self._mouse.get_ground_truth(self._img_n)[self._index]
 
     def get_holo(self):
-        return self._data.get_holo(self._img_n)[self._index[0:2]]
+        return self._mouse.get_holo(self._img_n)[self._index[0:2]]
 
 
 class Batch:
@@ -208,20 +216,20 @@ class Batch:
     def get_holos_in_batch(self):
         return self._h
 
-    def get_data_list(self):
-        return [patch.get_data() for patch in self._p]
+    def get_mouse_list(self):
+        return [patch.get_mouse() for patch in self._p]
 
     def get_index_list(self):
         return [patch.get_index() for patch in self._p]
 
 
-def batch_generator(data_list: List[Data], batch_size: int) -> Iterable[Batch]:
+def batch_generator(mouse_list: List[Mouse], batch_size: int) -> Iterable[Batch]:
     """
     A generator of image patches. Get image from disk (.tiff files) and
     return small patches to input into TensorFlow
     (Written by Jiabei Zhu on Jul. 30 2018)
 
-    :param data_list: data source of data
+    :param mouse_list: data source of mouses
     :param batch_size: the number of patches in a batch
     :return: dictionary of {"originalImage":'NDHWC' data in numpy array,
         "groundTruth":(same format)}
@@ -230,7 +238,7 @@ def batch_generator(data_list: List[Data], batch_size: int) -> Iterable[Batch]:
     # get random list
     yield_sequence = [
         Patch(i, j, k)
-        for i in data_list for k in i.index_list
+        for i in mouse_list for k in i.index_list
         for j in range(len(i))  # test only original now
     ]
 
@@ -239,6 +247,7 @@ def batch_generator(data_list: List[Data], batch_size: int) -> Iterable[Batch]:
     # do yield
     patch_list = []
     for patch in yield_sequence:  # type: Patch
+        # img_i = Patch(patch_i['mouse'], )
         patch_list.append(patch)
         if len(patch_list) == batch_size:
             yield Batch(patch_list)

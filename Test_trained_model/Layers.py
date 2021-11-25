@@ -1,6 +1,9 @@
 import tensorflow as tf
-LAMBDA_WEIGHT_REG = 1e-6
 
+
+# n_activations_prev_layer = patch_volume_prev * in_channels
+# n_activations_current_layer = patch_volume * out_channels
+# sqrt(3/(n_activations_prev_layer + n_activations_current_layer)) (assuming prev_patch==curr_patch)
 def xavier_normal_dist_conv3d(shape):
 	return tf.truncated_normal(shape, mean=0,
 							   stddev=tf.sqrt(3. / (tf.reduce_prod(shape[:3]) * tf.reduce_sum(shape[3:]))))
@@ -24,7 +27,7 @@ def convolution_3d(layer_input, filter, strides, padding='SAME'):
 	assert len(strides) == 5  # must match input dimensions [batch, in_depth, in_height, in_width, in_channels]
 	assert padding in ['VALID', 'SAME']
 
-	w = tf.get_variable(initializer=xavier_uniform_dist_conv3d(shape=filter), name='weights', regularizer=tf.contrib.layers.l2_regularizer(LAMBDA_WEIGHT_REG))
+	w = tf.Variable(initial_value=xavier_uniform_dist_conv3d(shape=filter), name='weights')
 	b = tf.Variable(tf.constant(1.0, shape=[filter[-1]]), name='biases')
 
 	return tf.nn.conv3d(layer_input, w, strides, padding) + b
@@ -35,7 +38,7 @@ def deconvolution_3d(layer_input, filter, output_shape, strides, padding='SAME')
 	assert len(strides) == 5  # must match input dimensions [batch, depth, height, width, in_channels]
 	assert padding in ['VALID', 'SAME']
 
-	w = tf.get_variable(initializer=xavier_uniform_dist_conv3d(shape=filter), name='weights', regularizer=tf.contrib.layers.l2_regularizer(LAMBDA_WEIGHT_REG))
+	w = tf.Variable(initial_value=xavier_uniform_dist_conv3d(shape=filter), name='weights')
 	b = tf.Variable(tf.constant(1.0, shape=[filter[-2]]), name='biases')
 
 	return tf.nn.conv3d_transpose(layer_input, w, output_shape, strides, padding) + b

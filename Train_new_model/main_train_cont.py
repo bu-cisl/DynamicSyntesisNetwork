@@ -17,7 +17,6 @@ from data_io import batch_generator, Mouse, save_3d_tiff
 ###
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-
 ### Main program begins here:
 step = 4 #downsample x
 input_channels = 1
@@ -41,8 +40,8 @@ train_iters = train_epochs*(ntrain_cube*ntrain_subcube)
 t = time.time()
 ################################################
 ################################################
-TRAIN_MOUSE_INDEX = range(5,75)
-MOUSE_N = 75
+TRAIN_MOUSE_INDEX = [1]#range(5,75)
+MOUSE_N = 2#75
 all_mouse_idx = range(0,MOUSE_N)
 tr_mouse_idx = TRAIN_MOUSE_INDEX
 te_mouse_idx = [e for e in all_mouse_idx if e not in TRAIN_MOUSE_INDEX]
@@ -138,15 +137,13 @@ for i in range(0,len(vars_all_e),3):
 # Loss: cross entropy
 cross_entropy = tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.reshape(y_,[batch_size*nx*ny*nz,output_channels]), logits=tf.reshape(y_conv,[batch_size*nx*ny*nz,output_channels]))
 cross_entropy = tf.reduce_mean(cross_entropy, name="cross_entropy")
-weight_decay = tf.reduce_sum(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
-total_loss = cross_entropy + weight_decay
-
+print(cross_entropy)
 
 # Optimizer: Adam
 #train_vars = gat_net_vars + vars_all_e
 #train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy, var_list=gat_net_vars, name="train_step") #train_step is an operation
 optimizer = tf.train.AdamOptimizer(1e-5)
-grads_and_vars = optimizer.compute_gradients(total_loss, var_list=gat_net_vars+vars_all_e+m2_enc_vars+m3_enc_vars+m4_enc_vars)
+grads_and_vars = optimizer.compute_gradients(cross_entropy, var_list=gat_net_vars+vars_all_e+m2_enc_vars+m3_enc_vars+m4_enc_vars)
 train_step = optimizer.apply_gradients(grads_and_vars, name='train_step')
 
 # Computation of slicewise dice score
@@ -155,34 +152,21 @@ pred_ = tf.placeholder(dtype=tf.float32, shape=(1024, 1024, 100), name="pred_")
 dice_, seg_, thresh_ = dice_opt_gpu(gt_, pred_)
 
 # Accuracy scores
-epoch = 0
+epoch_st = 3
 tr_loss = []
 te_loss = []
 te_loss_tmp = np.zeros((int(n_te_patches/batch_size)))
 pr_te_tmp = np.zeros((int(n_te_patches/batch_size)))
 saver = tf.train.Saver(max_to_keep=100)
 
-saver2e = tf.train.Saver(var_list=m2_enc_vars)
-saver3e = tf.train.Saver(var_list=m3_enc_vars)
-saver4e = tf.train.Saver(var_list=m4_enc_vars)
-
-saver2d = tf.train.Saver(var_list=m2_dec_vars)
-saver3d = tf.train.Saver(var_list=m3_dec_vars)
-saver4d = tf.train.Saver(var_list=m4_dec_vars)
 
 with tf.Session() as sess: # laun ch the model in an interactive session
 	sess.run(tf.global_variables_initializer()) # create an operation to initialize the variables we created
 	sess.run(tf.local_variables_initializer()) # needed to compute tp, tn, fp, fn
 
-	saver2d.restore(sess, './trained_chkpts_dec/dnn_conc_2/my-model')
-	saver3d.restore(sess, './trained_chkpts_dec/dnn_conc_3/my-model')
-	saver4d.restore(sess, './trained_chkpts_dec/dnn_conc_4/my-model')
-
-	saver2e.restore(sess, './trained_chkpts_enc/dnn_conc_2/my-model')
-	saver3e.restore(sess, './trained_chkpts_enc/dnn_conc_3/my-model')
-	saver4e.restore(sess, './trained_chkpts_enc/dnn_conc_4/my-model')
+	saver.restore(sess, './chkpt/my-model-%d'%(epoch_st-1))
 	
-	for epoch_i in range(1,train_epochs): # 10,000 iterations
+	for epoch_i in range(epoch_st,train_epochs): # 10,000 iterations
 
 		############### Training for one epoch ###############
 		ntrstep = 1
@@ -195,13 +179,35 @@ with tf.Session() as sess: # laun ch the model in an interactive session
 				y_: train_batch.get_ground_truths_in_batch()
 			}
 			train_step.run(feed_dict) # we run train_step feeding in the batches data to replace the placeholders
-			loss_ce, loss_wt = sess.run((cross_entropy, weight_decay), feed_dict)
-			tr_loss.append(loss_ce)
+			loss_p= sess.run((cross_entropy), feed_dict)
+			tr_loss.append(loss_p)
 			ntrstep = ntrstep + 1
 
 			# Printing diagnostics
 			elapsed = time.time() - t
-			print('[epoch: %d] [step: %d] [iter_time: %f] [loss_ce: %1.10f] [loss_wt: %1.10f]' % (epoch_i, ntrstep, elapsed, loss_ce, loss_wt))
+			print('[epoch: %d] [step: %d] [iter_time: %f] [loss: %1.10f]' % (epoch_i, ntrstep, elapsed, loss_p))
+			# print('[a1: %1.5e] [a2: %1.5e] [a3: %1.5e]' % (a[0,0], a[0,1], a[0,2]))
+			# print('[s1: %1.3f] [s2: %1.3f] [s3: %1.3f]' % (a_s[0,0], a_s[0,1], a_s[0,2]))
+			# print('no BN')
+			# print('[p1: %1.3e] [p2: %1.3e] [p3: %1.3e]'%(np.linalg.norm(p1p),np.linalg.norm(p2p),np.linalg.norm(p3p)))
+			# print('[f1: %1.3e] [f2: %1.3e] [f3: %1.3e] [f123: %1.3e]'%(np.linalg.norm(f1p),np.linalg.norm(f2p),np.linalg.norm(f3p),np.linalg.norm(f123p)))
+			# print('[l1: %1.3e] [l2: %1.3e] [a: %1.3e]'%(np.linalg.norm(l1p),np.linalg.norm(l2p),np.linalg.norm(a)))
+			# print('[l1_l2: %1.3e] [l1_mn: %1.3e] [l1_std: %1.3e]'%(np.linalg.norm(l1p), np.mean(l1p), np.std(l1p)))
+			# print('[l2_l2: %1.3e] [l2_mn: %1.3e] [l2_std: %1.3e]' % (np.linalg.norm(l2p), np.mean(l2p), np.std(l2p)))
+			# print('[a_l2: %1.3e] [a_mn: %1.3e] [a_std: %1.3e]' % (np.linalg.norm(a), np.mean(a), np.std(a)))
+			# print(' ')
+
+
+
+			# # Gradient
+			# vars_p = sess.run([variable for grad, variable in grads_and_vars], feed_dict=feed_dict)
+			# grads_p = sess.run([grad for grad, variable in grads_and_vars], feed_dict=feed_dict)
+			#
+			# print('Grads --------------------------------')
+			# for i in range(len(grads_p)):
+			# 	print('[var: %1.15f] [grad: %1.15f]' % (np.linalg.norm(vars_p[i]), np.linalg.norm(grads_p[i])))
+			# print('--------------------------------------')
+			# ##########
 
 			############### Testing after one epoch ###############
 			if (ntrstep % 10000) == 0:
