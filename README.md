@@ -17,11 +17,10 @@ https://arxiv.org/abs/2107.00484
 * In order to train the model, the data can be downloaded from the following google drive link:
 https://drive.google.com/drive/folders/1q5hliaW8NVGyA74BP49uqaWpJdVPOmiA
 
-* Download the 'data' folder from the above link and copy it to the 'Train_new_model' folder, such that it's path is **.../Train_new_model/data**
-
+* Download the 'data.zip' from the above link and decompress it to the 'Train_new_model' folder, such that it's path is **.../Train_new_model/data/**
+* Download the 'DSN_init_chkpt' folder from the above link and put the contents to the 'Train_new_model' folder, such that the paths are  **.../Train_new_model/trained_chkpts_enc/** and  **.../Train_new_model/trained_chkpts_dec/**. The contained folders 'trained_chkpts_enc' and 'trained_chkpts_dec' are used for the initialization of the encoder and decoder of DSN. They are the trained encoder and decoder from the expert network. 
 * To begin training, execute the script main_train.py as follows:
-
-$ python main_train.py
+`python main_train.py`
 
 # Using pretrained DSN model for testing
 
@@ -37,12 +36,10 @@ $ python main_test.py
 
 * The model will perform descattering on all test data and save results in the folder 'test_results'
 
-# multiple-scattering beam propagation model
+# Multiple-scattering beam propagation model
 The multiple-scattering simulator can be found in the following repository:
+
 https://github.com/bu-cisl/Large-Scale-3D-Holographic-Imaging-with-Beam-Propagation
 
 ## Dependencies
 **environment.yml** lists dependencies used to run this code on a machine with 128GB RAM and an Nvidia RTX-8000 GPU.
-
-
-
