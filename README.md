@@ -37,8 +37,8 @@ $ python main_test.py
 
 * The model will perform descattering on all test data and save results in the folder 'test_results'
 
-# multi-scattering beam propagation model
-The multi-scattering simulator can be found using this link:
+# multiple-scattering beam propagation model
+The multiple-scattering simulator can be found in the following repository:
 https://github.com/bu-cisl/Large-Scale-3D-Holographic-Imaging-with-Beam-Propagation
 
 ## Dependencies
