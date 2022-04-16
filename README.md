@@ -1,6 +1,6 @@
 # DynamicSyntesisNetwork
 
-This is the implementation of the dyniamic synthesis network (DSN) for large-scale 3D descattering, as presented in our publication:
+This is the implementation of the dynamic synthesis network (DSN) for large-scale 3D descattering, as presented in our publication:
 
 W. Tahir, H. Wang, L. Tian, "[Adaptive 3D descattering with a dynamic synthesis network](https://www.nature.com/articles/s41377-022-00730-x)", Light: Science & Applications volume 11, Article number: 42 (2022).
 
